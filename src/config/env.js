@@ -14,7 +14,9 @@ const schema = z.object({
   REALTIME_SECRET: z.string().min(16).optional(),
 });
 
-const parsed = schema.safeParse(process.env);
+// A variable that exists but is blank (easy to leave behind in a hosting dashboard) counts as not set.
+const present = Object.fromEntries(Object.entries(process.env).filter(([, value]) => value !== ""));
+const parsed = schema.safeParse(present);
 if (!parsed.success) {
   console.error("Invalid environment:", z.flattenError(parsed.error).fieldErrors);
   throw new Error("Invalid environment variables");
