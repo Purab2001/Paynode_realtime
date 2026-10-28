@@ -18,7 +18,8 @@ export const dmChannel = (a, b) => `dm:${[String(a), String(b)].sort().join(":")
 
 export function dmParticipants(channel) {
   const [prefix, a, b] = channel.split(":");
-  return prefix === "dm" && ID.test(a) && ID.test(b) ? [a, b] : null;
+  // Two different people: a channel pairing someone with themselves is never valid.
+  return prefix === "dm" && ID.test(a) && ID.test(b) && a.toLowerCase() !== b.toLowerCase() ? [a, b] : null;
 }
 
 export const otherParticipant = (channel, userId) => dmParticipants(channel)?.find((id) => id !== String(userId));

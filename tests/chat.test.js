@@ -175,6 +175,13 @@ describe("direct messages", () => {
     expect((await call(hana, "channels:list")).channels.find((c) => c.type === "dm").name).toBe("ann");
   });
 
+  it("refuses a channel that pairs someone with themselves", async () => {
+    const hana = await join("hana");
+    const self = `dm:${users.hana._id}:${users.hana._id}`;
+    expect((await call(hana, "message:send", { channel: self, text: "note to self" })).error.code).toBe("FORBIDDEN");
+    expect((await call(hana, "messages:history", { channel: self })).error.code).toBe("FORBIDDEN");
+  });
+
   it("is not available between two Employees", async () => {
     const ann = await join("ann");
     const res = await call(ann, "message:send", { channel: dm("ann", "bob"), text: "psst" });
